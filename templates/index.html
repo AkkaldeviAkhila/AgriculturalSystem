@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Smart Agriculture System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-success text-white rounded p-5 mb-4">
+            <div class="container">
+                <h1 class="display-4">
+                    <i class="fas fa-seedling"></i> Smart Agriculture System
+                </h1>
+                <p class="lead">Revolutionizing farming with AI-powered insights, predictions, and voice assistance for small farmers.</p>
+                {% if not session.user_id %}
+                <a class="btn btn-light btn-lg" href="{{ url_for('register') }}" role="button">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                {% else %}
+                <a class="btn btn-light btn-lg" href="{{ url_for('dashboard') }}" role="button">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-star"></i> Key Features
+        </h2>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Soil Analysis -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-mountain fa-3x text-success"></i>
+                </div>
+                <h5 class="card-title">Soil Analysis</h5>
+                <p class="card-text">
+                    AI-powered soil fertility prediction using Random Forest algorithm. 
+                    Get recommendations for soil improvement and fertilizer application.
+                </p>
+                {% if session.user_id %}
+                <a href="{{ url_for('soil_prediction') }}" class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Analyze Soil
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop Suggestions -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-info">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-leaf fa-3x text-info"></i>
+                </div>
+                <h5 class="card-title">Crop Recommendations</h5>
+                <p class="card-text">
+                    Smart crop suggestions based on soil conditions, weather, and market demands 
+                    using Decision Tree machine learning models.
+                </p>
+                {% if session.user_id %}
+                <a href="{{ url_for('crop_suggestion') }}" class="btn btn-info">
+                    <i class="fas fa-arrow-right"></i> Get Suggestions
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Disease Detection -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-microscope fa-3x text-warning"></i>
+                </div>
+                <h5 class="card-title">Disease Detection</h5>
+                <p class="card-text">
+                    Upload plant images for instant disease identification using advanced 
+                    deep learning models. Get treatment recommendations.
+                </p>
+                {% if session.user_id %}
+                <a href="{{ url_for('disease_detection') }}" class="btn btn-warning">
+                    <i class="fas fa-arrow-right"></i> Detect Disease
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Assistant -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-primary">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-comments fa-3x text-primary"></i>
+                </div>
+                <h5 class="card-title">Voice Assistant</h5>
+                <p class="card-text">
+                    Multilingual voice chatbot supporting Telugu, Hindi, and English. 
+                    Get farming advice through natural conversation.
+                </p>
+                {% if session.user_id %}
+                <a href="{{ url_for('chatbot_page') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i> Chat Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Benefits Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-thumbs-up"></i> Why Choose Our System?
+        </h2>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-chart-line fa-2x text-success mb-3"></i>
+            <h5>Increase Crop Yield</h5>
+            <p>Optimize your farming practices with data-driven insights to maximize crop production and quality.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-money-bill-wave fa-2x text-success mb-3"></i>
+            <h5>Reduce Costs</h5>
+            <p>Minimize fertilizer waste, prevent crop diseases early, and make informed decisions to cut farming costs.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-leaf fa-2x text-success mb-3"></i>
+            <h5>Sustainable Farming</h5>
+            <p>Promote eco-friendly practices with precision agriculture and organic farming recommendations.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Technology Stack -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-cogs"></i> Technology Behind the System
+        </h2>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-brain"></i> Machine Learning Models</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Random Forest for soil fertility prediction</li>
+                    <li><i class="fas fa-check text-success"></i> Decision Tree for crop recommendations</li>
+                    <li><i class="fas fa-check text-success"></i> Deep Learning CNN for disease detection</li>
+                    <li><i class="fas fa-check text-success"></i> Trained on agricultural datasets</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-microphone"></i> Voice Technology</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-info"></i> Speech recognition in multiple languages</li>
+                    <li><i class="fas fa-check text-info"></i> Text-to-speech for audio responses</li>
+                    <li><i class="fas fa-check text-info"></i> Natural language processing</li>
+                    <li><i class="fas fa-check text-info"></i> Context-aware conversations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+{% if not session.user_id %}
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h3><i class="fas fa-rocket"></i> Ready to Transform Your Farming?</h3>
+                <p class="lead">Join thousands of farmers who are already using AI to improve their agricultural practices.</p>
+                <div class="mt-3">
+                    <a href="{{ url_for('register') }}" class="btn btn-success btn-lg me-3">
+                        <i class="fas fa-user-plus"></i> Register Now
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-success btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

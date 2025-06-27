@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant - Smart Agriculture System{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/chatbot.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-comments text-primary"></i> AI Agriculture Assistant</h2>
+        <p class="lead">Chat with our multilingual AI assistant for farming advice and support.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chat Interface -->
+    <div class="col-md-8">
+        <div class="card chat-container">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-robot"></i> AgriBot Assistant</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-light" id="micBtn" onclick="toggleMicrophone()">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-light" id="speakerBtn" onclick="toggleSpeaker()">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Messages Area -->
+            <div class="card-body chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            Welcome to AgriBot! I'm here to help you with farming advice in Telugu, Hindi, and English. How can I assist you today?
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="card-footer">
+                <form id="chatForm" onsubmit="sendMessage(event)">
+                    <div class="input-group">
+                        <select class="form-select" id="languageSelect" style="max-width: 120px;">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="te">Telugu</option>
+                        </select>
+                        <input type="text" class="form-control" id="messageInput" 
+                               placeholder="Type your farming question..." required>
+                        <button class="btn btn-primary" type="submit" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Voice Input Status -->
+                <div id="voiceStatus" class="mt-2" style="display: none;">
+                    <small class="text-muted">
+                        <i class="fas fa-microphone text-danger"></i> Listening... Speak now
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assistant Features -->
+    <div class="col-md-4">
+        <!-- Language Support -->
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-language"></i> Language Support</h6>
+            </div>
+            <div class="card-body">
+                <div class="language-option" onclick="setLanguage('en')">
+                    <i class="fas fa-check-circle text-success"></i> English
+                    <small class="text-muted d-block">Ask questions in English</small>
+                </div>
+                <div class="language-option" onclick="setLanguage('hi')">
+                    <i class="fas fa-check-circle text-success"></i> हिंदी (Hindi)
+                    <small class="text-muted d-block">हिंदी में सवाल पूछें</small>
+                </div>
+                <div class="language-option" onclick="setLanguage('te')">
+                    <i class="fas fa-check-circle text-success"></i> తెలుగు (Telugu)
+                    <small class="text-muted d-block">తెలుగులో ప్రశ్నలు అడగండి</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Questions -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-question-circle"></i> Quick Questions</h6>
+            </div>
+            <div class="card-body">
+                <div class="quick-question" onclick="askQuestion('How to improve soil fertility?')">
+                    <i class="fas fa-mountain text-success"></i> Soil fertility tips
+                </div>
+                <div class="quick-question" onclick="askQuestion('Best crops for monsoon season?')">
+                    <i class="fas fa-leaf text-info"></i> Monsoon crops
+                </div>
+                <div class="quick-question" onclick="askQuestion('How to control pests naturally?')">
+                    <i class="fas fa-bug text-warning"></i> Pest control
+                </div>
+                <div class="quick-question" onclick="askQuestion('Water saving irrigation methods?')">
+                    <i class="fas fa-tint text-primary"></i> Irrigation tips
+                </div>
+                <div class="quick-question" onclick="askQuestion('Organic farming practices?')">
+                    <i class="fas fa-seedling text-success"></i> Organic farming
+                </div>
+                <div class="quick-question" onclick="askQuestion('Market price information?')">
+                    <i class="fas fa-coins text-warning"></i> Market prices
+                </div>
+            </div>
+        </div>
+        
+        <!-- Voice Commands -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-microphone"></i> Voice Features</h6>
+            </div>
+            <div class="card-body">
+                <div class="feature-item">
+                    <i class="fas fa-microphone text-primary"></i>
+                    <strong>Speech Input</strong>
+                    <small class="text-muted d-block">Click mic button and speak your question</small>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-volume-up text-primary"></i>
+                    <strong>Audio Responses</strong>
+                    <small class="text-muted d-block">Listen to responses in your language</small>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-language text-primary"></i>
+                    <strong>Auto Detection</strong>
+                    <small class="text-muted d-block">Automatically detects your language</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat History -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-history"></i> Chat Actions</h6>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="clearChat()">
+                    <i class="fas fa-trash"></i> Clear Chat
+                </button>
+                <button class="btn btn-outline-info btn-sm w-100 mb-2" onclick="exportChat()">
+                    <i class="fas fa-download"></i> Export Chat
+                </button>
+                <button class="btn btn-outline-success btn-sm w-100" onclick="shareChat()">
+                    <i class="fas fa-share"></i> Share Session
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sample Conversations Modal -->
+<div class="modal fade" id="samplesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sample Conversations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>English</h6>
+                        <div class="sample-conversation">
+                            <strong>User:</strong> How to increase crop yield?<br>
+                            <strong>Bot:</strong> To increase crop yield, focus on soil health, proper irrigation, balanced fertilization, and pest management...
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Hindi</h6>
+                        <div class="sample-conversation">
+                            <strong>User:</strong> मिट्टी की उर्वरता कैसे बढ़ाएं?<br>
+                            <strong>Bot:</strong> मिट्टी की उर्वरता बढ़ाने के लिए जैविक खाद का उपयोग करें...
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Telugu</h6>
+                        <div class="sample-conversation">
+                            <strong>User:</strong> వ్యవసాయంలో నీటి పంపిణీ ఎలా?<br>
+                            <strong>Bot:</strong> చినుకు నీటిపారుదల వ్యవస్థ ఉపయోగించండి...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+<script>
+// Initialize chatbot when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChatbot();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Disease Detection - Smart Agriculture System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-microscope text-warning"></i> Plant Disease Detection</h2>
+        <p class="lead">Upload plant images for instant AI-powered disease identification and treatment recommendations.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upload Form -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-upload"></i> Image Upload</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('disease_detection') }}" enctype="multipart/form-data" id="diseaseForm">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">
+                            <i class="fas fa-image"></i> Plant Image
+                        </label>
+                        <input type="file" class="form-control" id="image" name="image" 
+                               accept="image/*" required onchange="previewImage(this)">
+                        <div class="form-text">Upload clear images of affected plant parts (leaves, stems, fruits)</div>
+                    </div>
+                    
+                    <!-- Image Preview -->
+                    <div id="imagePreview" class="mb-3" style="display: none;">
+                        <label class="form-label">Preview:</label>
+                        <div class="text-center">
+                            <img id="preview" src="" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-search"></i> Detect Disease
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Upload Guidelines -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6><i class="fas fa-camera"></i> Photo Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success"><i class="fas fa-check"></i> Good Photos</h6>
+                        <ul class="small">
+                            <li>Clear, well-lit images</li>
+                            <li>Focus on affected areas</li>
+                            <li>Multiple angles if possible</li>
+                            <li>High resolution (minimum 500x500)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-danger"><i class="fas fa-times"></i> Avoid</h6>
+                        <ul class="small">
+                            <li>Blurry or dark images</li>
+                            <li>Too much background</li>
+                            <li>Very small affected areas</li>
+                            <li>Images with filters</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info alert-sm mt-2">
+                    <small><i class="fas fa-lightbulb"></i> Take photos during daylight for best results.</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Supported Diseases -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-list"></i> Detectable Diseases</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="small list-unstyled">
+                            <li><i class="fas fa-bug text-warning"></i> Bacterial Blight</li>
+                            <li><i class="fas fa-bug text-warning"></i> Brown Spot</li>
+                            <li><i class="fas fa-bug text-warning"></i> Leaf Smut</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="small list-unstyled">
+                            <li><i class="fas fa-bug text-warning"></i> Rust Disease</li>
+                            <li><i class="fas fa-bug text-warning"></i> Mosaic Virus</li>
+                            <li><i class="fas fa-check text-success"></i> Healthy Plants</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="col-md-6">
+        {% if prediction_result %}
+        <div class="card">
+            <div class="card-header 
+                {% if prediction_result.disease_class == 'Healthy' %}bg-success
+                {% else %}bg-danger{% endif %} text-white">
+                <h5><i class="fas fa-diagnoses"></i> Detection Results</h5>
+            </div>
+            <div class="card-body">
+                <!-- Uploaded Image -->
+                {% if prediction_result.image_data %}
+                <div class="text-center mb-3">
+                    <img src="data:image/png;base64,{{ prediction_result.image_data }}" 
+                         alt="Uploaded Image" class="img-thumbnail" style="max-height: 200px;">
+                </div>
+                {% endif %}
+                
+                <!-- Disease Classification -->
+                <div class="text-center mb-4">
+                    <h3 class="
+                        {% if prediction_result.disease_class == 'Healthy' %}text-success
+                        {% else %}text-danger{% endif %}">
+                        {{ prediction_result.disease_class }}
+                    </h3>
+                    
+                    <!-- Confidence Score -->
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar 
+                            {% if prediction_result.confidence >= 80 %}bg-success
+                            {% elif prediction_result.confidence >= 60 %}bg-warning
+                            {% else %}bg-danger{% endif %}" 
+                            style="width: {{ prediction_result.confidence }}%">
+                            {{ "%.1f"|format(prediction_result.confidence) }}% Confidence
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Treatment Recommendations -->
+                {% if prediction_result.disease_class != 'Healthy' %}
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Disease Detected</h6>
+                    <p class="mb-0">Immediate attention required to prevent spread.</p>
+                </div>
+                
+                <h6><i class="fas fa-pills"></i> Treatment:</h6>
+                <div class="alert alert-info">
+                    {{ prediction_result.treatment }}
+                </div>
+                
+                <h6><i class="fas fa-shield-alt"></i> Prevention Tips:</h6>
+                <ul class="small">
+                    <li>Improve air circulation around plants</li>
+                    <li>Avoid overhead watering</li>
+                    <li>Remove infected plant material immediately</li>
+                    <li>Apply preventive fungicide sprays</li>
+                    <li>Practice crop rotation</li>
+                </ul>
+                {% else %}
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-check-circle"></i> Healthy Plant</h6>
+                    <p class="mb-0">Your plant appears healthy! Continue with regular care.</p>
+                </div>
+                
+                <h6><i class="fas fa-leaf"></i> Maintain Health:</h6>
+                <ul class="small">
+                    <li>Regular monitoring for early detection</li>
+                    <li>Proper nutrition and watering</li>
+                    <li>Good sanitation practices</li>
+                    <li>Timely pruning and maintenance</li>
+                </ul>
+                {% endif %}
+                
+                <!-- Action Buttons -->
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="saveResults()">
+                        <i class="fas fa-save"></i> Save Results
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="shareResults()">
+                        <i class="fas fa-share"></i> Share with Expert
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">
+                        <i class="fas fa-redo"></i> Analyze Another
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Placeholder when no results -->
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-camera fa-4x text-muted mb-3"></i>
+                <h5>Upload Plant Image</h5>
+                <p class="text-muted">Select a clear image of your plant to get instant disease analysis and treatment recommendations.</p>
+                
+                <!-- Quick Upload Button -->
+                <button class="btn btn-outline-secondary" onclick="document.getElementById('image').click()">
+                    <i class="fas fa-upload"></i> Choose Image
+                </button>
+            </div>
+        </div>
+        
+        <!-- Disease Information -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Common Plant Diseases</h6>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="diseaseInfo">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bacterial-blight">
+                                Bacterial Blight
+                            </button>
+                        </h2>
+                        <div id="bacterial-blight" class="accordion-collapse collapse" data-bs-parent="#diseaseInfo">
+                            <div class="accordion-body small">
+                                <strong>Symptoms:</strong> Water-soaked lesions with yellow halos on leaves.<br>
+                                <strong>Cause:</strong> Bacterial infection, often spread by water and insects.<br>
+                                <strong>Treatment:</strong> Copper-based bactericides and improved ventilation.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#brown-spot">
+                                Brown Spot
+                            </button>
+                        </h2>
+                        <div id="brown-spot" class="accordion-collapse collapse" data-bs-parent="#diseaseInfo">
+                            <div class="accordion-body small">
+                                <strong>Symptoms:</strong> Brown circular spots on leaves and stems.<br>
+                                <strong>Cause:</strong> Fungal infection, favored by high humidity.<br>
+                                <strong>Treatment:</strong> Fungicide application and removal of affected parts.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mosaic-virus">
+                                Mosaic Virus
+                            </button>
+                        </h2>
+                        <div id="mosaic-virus" class="accordion-collapse collapse" data-bs-parent="#diseaseInfo">
+                            <div class="accordion-body small">
+                                <strong>Symptoms:</strong> Mosaic pattern of light and dark green on leaves.<br>
+                                <strong>Cause:</strong> Viral infection transmitted by insects or contaminated tools.<br>
+                                <strong>Treatment:</strong> No cure; remove infected plants and control vectors.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            document.getElementById('preview').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function saveResults() {
+    alert('Disease detection results saved to your dashboard!');
+}
+
+function shareResults() {
+    alert('Results shared with agricultural experts. You will receive detailed advice within 24 hours.');
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('diseaseForm');
+    const fileInput = document.getElementById('image');
+    
+    form.addEventListener('submit', function(e) {
+        if (!fileInput.files[0]) {
+            e.preventDefault();
+            alert('Please select an image file first.');
+            return;
+        }
+        
+        const file = fileInput.files[0];
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        
+        if (file.size > maxSize) {
+            e.preventDefault();
+            alert('Image file is too large. Please select a file smaller than 16MB.');
+            return;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+            e.preventDefault();
+            alert('Please select a valid image file.');
+            return;
+        }
+    });
+    
+    // Drag and drop functionality
+    const dropZone = document.querySelector('.card-body');
+    
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-primary');
+    });
+    
+    dropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+    });
+    
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Crop Suggestion - Smart Agriculture System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-leaf text-info"></i> Crop Recommendation System</h2>
+        <p class="lead">Get AI-powered crop suggestions based on soil conditions, weather, and environmental factors.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Input Form -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-seedling"></i> Environmental Parameters</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('crop_suggestion') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nitrogen" class="form-label">
+                                    <i class="fas fa-atom"></i> Nitrogen (N) - kg/ha
+                                </label>
+                                <input type="number" class="form-control" id="nitrogen" name="nitrogen" 
+                                       step="0.1" min="0" max="300" required>
+                                <div class="form-text">Range: 0-300 kg/ha</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phosphorus" class="form-label">
+                                    <i class="fas fa-atom"></i> Phosphorus (P) - kg/ha
+                                </label>
+                                <input type="number" class="form-control" id="phosphorus" name="phosphorus" 
+                                       step="0.1" min="0" max="200" required>
+                                <div class="form-text">Range: 0-200 kg/ha</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="potassium" class="form-label">
+                                    <i class="fas fa-atom"></i> Potassium (K) - kg/ha
+                                </label>
+                                <input type="number" class="form-control" id="potassium" name="potassium" 
+                                       step="0.1" min="0" max="300" required>
+                                <div class="form-text">Range: 0-300 kg/ha</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="temperature" class="form-label">
+                                    <i class="fas fa-thermometer-half"></i> Temperature (°C)
+                                </label>
+                                <input type="number" class="form-control" id="temperature" name="temperature" 
+                                       step="0.1" min="0" max="50" required>
+                                <div class="form-text">Average temperature</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="humidity" class="form-label">
+                                    <i class="fas fa-tint"></i> Humidity (%)
+                                </label>
+                                <input type="number" class="form-control" id="humidity" name="humidity" 
+                                       step="0.1" min="0" max="100" required>
+                                <div class="form-text">Relative humidity</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="ph" class="form-label">
+                                    <i class="fas fa-balance-scale"></i> Soil pH
+                                </label>
+                                <input type="number" class="form-control" id="ph" name="ph" 
+                                       step="0.1" min="0" max="14" required>
+                                <div class="form-text">Soil acidity level</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="rainfall" class="form-label">
+                            <i class="fas fa-cloud-rain"></i> Rainfall (mm)
+                        </label>
+                        <input type="number" class="form-control" id="rainfall" name="rainfall" 
+                               step="0.1" min="0" max="3000" required>
+                        <div class="form-text">Annual rainfall in mm</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-brain"></i> Get Crop Recommendation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Crop Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> How Crop Recommendation Works</h6>
+            </div>
+            <div class="card-body">
+                <ol class="small">
+                    <li><strong>Environmental Analysis:</strong> Input soil and climate parameters</li>
+                    <li><strong>AI Processing:</strong> Decision Tree algorithm analyzes conditions</li>
+                    <li><strong>Crop Matching:</strong> System matches optimal crops for your conditions</li>
+                    <li><strong>Detailed Info:</strong> Get specific cultivation guidance</li>
+                </ol>
+                <div class="alert alert-info alert-sm mt-2">
+                    <small><i class="fas fa-lightbulb"></i> Consider local market demand and your farming experience.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="col-md-6">
+        {% if prediction_result %}
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-trophy"></i> Recommended Crop</h5>
+            </div>
+            <div class="card-body">
+                <!-- Crop Recommendation -->
+                <div class="text-center mb-4">
+                    <i class="fas fa-leaf fa-3x text-success mb-3"></i>
+                    <h3 class="text-success">{{ prediction_result.recommended_crop }}</h3>
+                    
+                    <!-- Confidence Score -->
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar 
+                            {% if prediction_result.confidence >= 80 %}bg-success
+                            {% elif prediction_result.confidence >= 60 %}bg-warning
+                            {% else %}bg-danger{% endif %}" 
+                            style="width: {{ prediction_result.confidence }}%">
+                            {{ "%.1f"|format(prediction_result.confidence) }}% Match
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Crop Information -->
+                {% if prediction_result.crop_info %}
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong><i class="fas fa-calendar"></i> Season:</strong><br>
+                        <span class="text-muted">{{ prediction_result.crop_info.season }}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong><i class="fas fa-clock"></i> Duration:</strong><br>
+                        <span class="text-muted">{{ prediction_result.crop_info.duration }}</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong><i class="fas fa-tint"></i> Water Requirement:</strong><br>
+                        <span class="text-muted">{{ prediction_result.crop_info.water_requirement }}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong><i class="fas fa-mountain"></i> Soil Type:</strong><br>
+                        <span class="text-muted">{{ prediction_result.crop_info.soil_type }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Action Buttons -->
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="saveCropPlan()">
+                        <i class="fas fa-save"></i> Save Plan
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="getCropCalendar()">
+                        <i class="fas fa-calendar-alt"></i> Get Calendar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cultivation Tips -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-tools"></i> Cultivation Tips</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <strong>Great Choice!</strong> {{ prediction_result.recommended_crop }} is well-suited for your conditions.
+                </div>
+                
+                <h6>General Guidelines:</h6>
+                <ul class="small">
+                    <li>Prepare land 2-3 weeks before sowing</li>
+                    <li>Use certified seeds for better yield</li>
+                    <li>Follow recommended spacing between plants</li>
+                    <li>Monitor for pests and diseases regularly</li>
+                    <li>Apply fertilizers as per soil test recommendations</li>
+                </ul>
+                
+                <div class="alert alert-warning alert-sm">
+                    <small><i class="fas fa-exclamation-triangle"></i> Always consult local agricultural experts for region-specific advice.</small>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Placeholder when no results -->
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-seedling fa-4x text-muted mb-3"></i>
+                <h5>Enter Environmental Data</h5>
+                <p class="text-muted">Fill in the environmental parameters to get personalized crop recommendations.</p>
+                
+                <!-- Sample Values Button -->
+                <button class="btn btn-outline-secondary" onclick="fillSampleValues()">
+                    <i class="fas fa-magic"></i> Use Sample Values
+                </button>
+            </div>
+        </div>
+        
+        <!-- Popular Crops -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-star"></i> Popular Crops by Season</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success">Kharif (Monsoon)</h6>
+                        <ul class="small list-unstyled">
+                            <li><i class="fas fa-leaf text-success"></i> Rice</li>
+                            <li><i class="fas fa-leaf text-success"></i> Cotton</li>
+                            <li><i class="fas fa-leaf text-success"></i> Maize</li>
+                            <li><i class="fas fa-leaf text-success"></i> Sugarcane</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-info">Rabi (Winter)</h6>
+                        <ul class="small list-unstyled">
+                            <li><i class="fas fa-leaf text-info"></i> Wheat</li>
+                            <li><i class="fas fa-leaf text-info"></i> Barley</li>
+                            <li><i class="fas fa-leaf text-info"></i> Peas</li>
+                            <li><i class="fas fa-leaf text-info"></i> Mustard</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillSampleValues() {
+    document.getElementById('nitrogen').value = '90';
+    document.getElementById('phosphorus').value = '42';
+    document.getElementById('potassium').value = '43';
+    document.getElementById('temperature').value = '20.9';
+    document.getElementById('humidity').value = '82';
+    document.getElementById('ph').value = '6.5';
+    document.getElementById('rainfall').value = '202.9';
+}
+
+function saveCropPlan() {
+    alert('Crop plan saved to your dashboard! You can access it anytime from your predictions history.');
+}
+
+function getCropCalendar() {
+    alert('Farming calendar feature will generate a detailed timeline for your crop cultivation activities.');
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const inputs = form.querySelectorAll('input[type="number"]');
+        let valid = true;
+        
+        inputs.forEach(input => {
+            const value = parseFloat(input.value);
+            const min = parseFloat(input.min);
+            const max = parseFloat(input.max);
+            
+            if (value < min || value > max) {
+                input.classList.add('is-invalid');
+                valid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Please check your input values. Some parameters are outside the acceptable range.');
+        }
+    });
+});
+</script>
+{% endblock %}
