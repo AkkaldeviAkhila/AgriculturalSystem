@@ -1,313 +1,95 @@
 {% extends "base.html" %}
-
-{% block title %}Soil Analysis - Smart Agriculture System{% endblock %}
+{% block title %}Soil Fertility Analysis{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-12">
-        <h2><i class="fas fa-mountain text-success"></i> Soil Fertility Analysis</h2>
-        <p class="lead">Get AI-powered insights about your soil fertility and improvement recommendations.</p>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Input Form -->
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5><i class="fas fa-flask"></i> Soil Parameters</h5>
-            </div>
+        <h2 class="text-success"><i class="fas fa-seedling"></i> Soil Fertility Analysis</h2>
+        <p>Get AI-powered fertility predictions with improvement recommendations.</p>
+
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">Enter Soil Parameters</div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('soil_prediction') }}">
-                    <div class="mb-3">
-                        <label for="nitrogen" class="form-label">
-                            <i class="fas fa-atom"></i> Nitrogen (N) - ppm
-                        </label>
-                        <input type="number" class="form-control" id="nitrogen" name="nitrogen" 
-                               step="0.1" min="0" max="200" required>
-                        <div class="form-text">Typical range: 20-80 ppm</div>
+                    <div class="mb-2">
+                        <label>Nitrogen (N) ppm (10-300)</label>
+                        <input type="number" name="n" min="10" max="300" step="0.1" class="form-control" required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="phosphorus" class="form-label">
-                            <i class="fas fa-atom"></i> Phosphorus (P) - ppm
-                        </label>
-                        <input type="number" class="form-control" id="phosphorus" name="phosphorus" 
-                               step="0.1" min="0" max="150" required>
-                        <div class="form-text">Typical range: 15-60 ppm</div>
+                    <div class="mb-2">
+                        <label>Phosphorus (P) ppm (5-100)</label>
+                        <input type="number" name="p" min="5" max="100" step="0.1" class="form-control" required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="potassium" class="form-label">
-                            <i class="fas fa-atom"></i> Potassium (K) - ppm
-                        </label>
-                        <input type="number" class="form-control" id="potassium" name="potassium" 
-                               step="0.1" min="0" max="200" required>
-                        <div class="form-text">Typical range: 20-100 ppm</div>
+                    <div class="mb-2">
+                        <label>Potassium (K) ppm (50-400)</label>
+                        <input type="number" name="k" min="50" max="400" step="0.1" class="form-control" required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="ph" class="form-label">
-                            <i class="fas fa-balance-scale"></i> pH Level
-                        </label>
-                        <input type="number" class="form-control" id="ph" name="ph" 
-                               step="0.1" min="3" max="10" required>
-                        <div class="form-text">Typical range: 5.5-8.5</div>
+                    <div class="mb-2">
+                        <label>pH (4.5-9.0)</label>
+                        <input type="number" name="ph" min="4.5" max="9.0" step="0.01" class="form-control" required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="organic_matter" class="form-label">
-                            <i class="fas fa-leaf"></i> Organic Matter (%)
-                        </label>
-                        <input type="number" class="form-control" id="organic_matter" name="organic_matter" 
-                               step="0.1" min="0" max="20" required>
-                        <div class="form-text">Typical range: 1-8%</div>
+                    <div class="mb-2">
+                        <label>Electrical Conductivity (EC) dS/m (0-3)</label>
+                        <input type="number" name="ec" min="0" max="3" step="0.01" class="form-control" required>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="moisture" class="form-label">
-                            <i class="fas fa-tint"></i> Moisture Content (%)
-                        </label>
-                        <input type="number" class="form-control" id="moisture" name="moisture" 
-                               step="0.1" min="0" max="100" required>
-                        <div class="form-text">Typical range: 10-50%</div>
+                    <div class="mb-2">
+                        <label>Organic Carbon (OC) % (0-5)</label>
+                        <input type="number" name="oc" min="0" max="5" step="0.01" class="form-control" required>
                     </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-brain"></i> Analyze Soil Fertility
-                        </button>
-                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 mt-2">
+                        <i class="fas fa-brain"></i> Predict Fertility
+                    </button>
                 </form>
-            </div>
-        </div>
-        
-        <!-- How It Works -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6><i class="fas fa-info-circle"></i> How Soil Analysis Works</h6>
-            </div>
-            <div class="card-body">
-                <ol class="small">
-                    <li><strong>Data Collection:</strong> Input your soil test parameters</li>
-                    <li><strong>ML Processing:</strong> Random Forest algorithm analyzes the data</li>
-                    <li><strong>Fertility Classification:</strong> Soil classified as High, Medium, or Low fertility</li>
-                    <li><strong>Recommendations:</strong> Get specific improvement suggestions</li>
-                </ol>
-                <div class="alert alert-info alert-sm mt-2">
-                    <small><i class="fas fa-lightbulb"></i> Get soil tested from your local agricultural office for accurate parameters.</small>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Results -->
-    <div class="col-md-6">
-        {% if prediction_result %}
-        <div class="card">
-            <div class="card-header 
-                {% if prediction_result.fertility_class == 'High' %}bg-success
-                {% elif prediction_result.fertility_class == 'Medium' %}bg-warning
-                {% else %}bg-danger{% endif %} text-white">
-                <h5><i class="fas fa-chart-bar"></i> Analysis Results</h5>
-            </div>
-            <div class="card-body">
-                <!-- Fertility Classification -->
-                <div class="text-center mb-4">
-                    <h3 class="
-                        {% if prediction_result.fertility_class == 'High' %}text-success
-                        {% elif prediction_result.fertility_class == 'Medium' %}text-warning
-                        {% else %}text-danger{% endif %}">
-                        {{ prediction_result.fertility_class }} Fertility
-                    </h3>
-                    
-                    <!-- Confidence Score -->
-                    <div class="progress mb-3" style="height: 25px;">
-                        <div class="progress-bar 
-                            {% if prediction_result.confidence >= 80 %}bg-success
-                            {% elif prediction_result.confidence >= 60 %}bg-warning
-                            {% else %}bg-danger{% endif %}" 
-                            style="width: {{ prediction_result.confidence }}%">
-                            {{ "%.1f"|format(prediction_result.confidence) }}% Confidence
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Recommendations -->
-                <h6><i class="fas fa-lightbulb"></i> Recommendations:</h6>
-                <ul class="list-group list-group-flush">
-                    {% for recommendation in prediction_result.recommendations %}
-                    <li class="list-group-item">
-                        <i class="fas fa-check text-success"></i> {{ recommendation }}
-                    </li>
-                    {% endfor %}
-                </ul>
-                
-                <!-- Action Buttons -->
-                <div class="mt-3">
-                    <button class="btn btn-outline-primary btn-sm" onclick="printResults()">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
-                    <button class="btn btn-outline-info btn-sm" onclick="shareResults()">
-                        <i class="fas fa-share"></i> Share Results
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Soil Improvement Tips -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6><i class="fas fa-tools"></i> Soil Improvement Tips</h6>
-            </div>
-            <div class="card-body">
-                {% if prediction_result.fertility_class == 'High' %}
-                <div class="alert alert-success">
-                    <strong>Excellent!</strong> Your soil has high fertility. Focus on maintaining these levels.
-                </div>
-                {% elif prediction_result.fertility_class == 'Medium' %}
-                <div class="alert alert-warning">
-                    <strong>Good Progress!</strong> Your soil has medium fertility. Small improvements can boost productivity.
-                </div>
-                {% else %}
-                <div class="alert alert-danger">
-                    <strong>Attention Needed!</strong> Your soil needs significant improvement for optimal crop growth.
-                </div>
-                {% endif %}
-                
-                <h6>General Tips:</h6>
-                <ul class="small">
-                    <li>Regular soil testing every 6 months</li>
-                    <li>Proper crop rotation to maintain soil health</li>
-                    <li>Use organic matter to improve soil structure</li>
-                    <li>Monitor pH levels and adjust as needed</li>
-                </ul>
-            </div>
-        </div>
-        {% else %}
-        <!-- Placeholder when no results -->
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="fas fa-flask fa-4x text-muted mb-3"></i>
-                <h5>Enter Soil Parameters</h5>
-                <p class="text-muted">Fill in the soil test parameters on the left to get your fertility analysis and recommendations.</p>
-                
-                <!-- Sample Values Button -->
-                <button class="btn btn-outline-secondary" onclick="fillSampleValues()">
+                <button class="btn btn-outline-secondary w-100 mt-2" onclick="fillSampleValues()">
                     <i class="fas fa-magic"></i> Use Sample Values
                 </button>
             </div>
         </div>
-        
-        <!-- Educational Content -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6><i class="fas fa-graduation-cap"></i> Understanding Soil Parameters</h6>
-            </div>
-            <div class="card-body">
-                <div class="accordion" id="soilEducation">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nitrogen-info">
-                                Nitrogen (N)
-                            </button>
-                        </h2>
-                        <div id="nitrogen-info" class="accordion-collapse collapse" data-bs-parent="#soilEducation">
-                            <div class="accordion-body small">
-                                Essential for leaf growth and chlorophyll production. Deficiency causes yellowing of leaves.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#phosphorus-info">
-                                Phosphorus (P)
-                            </button>
-                        </h2>
-                        <div id="phosphorus-info" class="accordion-collapse collapse" data-bs-parent="#soilEducation">
-                            <div class="accordion-body small">
-                                Important for root development and flowering. Helps in energy transfer within plants.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#potassium-info">
-                                Potassium (K)
-                            </button>
-                        </h2>
-                        <div id="potassium-info" class="accordion-collapse collapse" data-bs-parent="#soilEducation">
-                            <div class="accordion-body small">
-                                Enhances disease resistance and improves fruit quality. Essential for water regulation.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
+<div class="col-md-6">
+    {% if prediction_result %}
+    <div class="card shadow text-center">
+        <div class="card-header bg-info text-white">Prediction Result</div>
+        <div class="card-body">
+            <h3 class="text-success">
+                {% if prediction_result.fertility_class == "0" %}
+                    Low Fertility
+                {% elif prediction_result.fertility_class == "1" %}
+                    Medium Fertility
+                {% elif prediction_result.fertility_class == "2" %}
+                    High Fertility
+                {% else %}
+                    {{ prediction_result.fertility_class }}
+                {% endif %}
+            </h3>
+            <p>{{ "%.2f"|format(prediction_result.confidence) }}% Confidence</p>
+            <h5>Recommendations:</h5>
+            <ul class="text-start">
+                {% for rec in prediction_result.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 function fillSampleValues() {
-    document.getElementById('nitrogen').value = '45.5';
-    document.getElementById('phosphorus').value = '32.0';
-    document.getElementById('potassium').value = '38.5';
-    document.getElementById('ph').value = '6.8';
-    document.getElementById('organic_matter').value = '3.2';
-    document.getElementById('moisture').value = '22.5';
-}
-
-function printResults() {
-    window.print();
-}
-
-function shareResults() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Soil Analysis Results',
-            text: 'Check out my soil fertility analysis results from Smart Agriculture System!',
-            url: window.location.href
-        });
-    } else {
-        // Fallback for browsers that don't support Web Share API
-        const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
-            alert('Results URL copied to clipboard!');
-        });
+    const samples = {
+        n: 120,
+        p: 25,
+        k: 180,
+        ph: 6.8,
+        ec: 1.2,
+        oc: 0.9
+    };
+    for (const [key, value] of Object.entries(samples)) {
+        document.querySelector(`[name="${key}"]`).value = value;
     }
 }
-
-// Form validation
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        const inputs = form.querySelectorAll('input[type="number"]');
-        let valid = true;
-        
-        inputs.forEach(input => {
-            const value = parseFloat(input.value);
-            const min = parseFloat(input.min);
-            const max = parseFloat(input.max);
-            
-            if (value < min || value > max) {
-                input.classList.add('is-invalid');
-                valid = false;
-            } else {
-                input.classList.remove('is-invalid');
-            }
-        });
-        
-        if (!valid) {
-            e.preventDefault();
-            alert('Please check your input values. Some parameters are outside the typical range.');
-        }
-    });
-});
 </script>
 {% endblock %}

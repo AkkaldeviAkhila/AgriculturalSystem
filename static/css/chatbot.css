@@ -1,0 +1,9 @@
+.bot-message {
+    background-color: #e3f2fd; /* Light blue background */
+    color: #0d47a1;            /* Deep blue text */
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
