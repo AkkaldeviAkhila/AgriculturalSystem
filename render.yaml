@@ -1,11 +1,10 @@
 services:
   - type: web
-    name: SmartAgriSystem
+    name: smart-agriculture-system
     env: python
-    region: oregon
-    buildCommand: pip install -r requirements.txt
+    buildCommand: ""
     startCommand: gunicorn app:app
-    pythonVersion: 3.10.0
+    pythonVersion: 3.10.12
 
 
 
