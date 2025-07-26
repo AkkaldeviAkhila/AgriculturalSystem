@@ -1,7 +1,5 @@
-Flask==2.3.3
-tensorflow==2.14.0
-pandas
-numpy
-scikit-learn
-opencv-python
+flask
 gunicorn
+scikit-learn
+numpy
+pandas
