@@ -1,7 +1,10 @@
 services:
   - type: web
-    name: smart-agriculture-app
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    name: smart-agriculture
+    runtime: python
     pythonVersion: 3.10.13
+    buildCommand: ""
+    startCommand: "python app.py"
+    envVars:
+      - key: PORT
+        value: 10000
