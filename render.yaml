@@ -1,10 +1,11 @@
 services:
   - type: web
-    name: smart-agriculture-system
+    name: smart-agriculture
     env: python
-    buildCommand: ""
-    startCommand: gunicorn app:app
     pythonVersion: 3.10.12
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+
 
 
 
