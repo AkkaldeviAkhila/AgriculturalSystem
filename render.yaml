@@ -1,9 +1,8 @@
 services:
   - type: web
-    name: smart-agriculture-system
-    runtime: python
+    name: SmartAgriSystem
     env: python
-    pythonVersion: 3.10
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
+    pythonVersion: 3.10
 
