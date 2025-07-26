@@ -2,8 +2,10 @@ services:
   - type: web
     name: SmartAgriSystem
     env: python
+    region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-    pythonVersion: 3.10
+    pythonVersion: 3.10.0
+
 
 
